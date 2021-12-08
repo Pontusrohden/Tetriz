@@ -9,21 +9,24 @@ public class GameFrame extends JFrame{
 	private StartPanel startPanel;
 	private SettingsPanel settingsPanel;
 	private PausePanel pausePanel;
+	private MultiplayerGamePanel multiplayerGamePanel;
 
 	private JPanel[] panelContainer;
-	private int screens = 4;
+	private int screens = 5;
 	
 	GameFrame(){
 		startPanel = new StartPanel(this);
 		gamePanel = new GamePanel(this);
 		settingsPanel = new SettingsPanel(this);
 		pausePanel = new PausePanel(this);
+		multiplayerGamePanel = new MultiplayerGamePanel(this);
 		
 		panelContainer = new JPanel[screens];
 		panelContainer[0] = startPanel;
 		panelContainer[1] = gamePanel;
 		panelContainer[2] = settingsPanel;
 		panelContainer[3] = pausePanel;
+		panelContainer[4] = multiplayerGamePanel;
 
 		this.add(panelContainer[0]);
 		this.setTitle("Tretriz");
@@ -36,6 +39,9 @@ public class GameFrame extends JFrame{
 	public void changePanel(int panelIndex) {
 		if(panelIndex == 1) {
 			gamePanel.startGame();
+		}
+		if(panelIndex == 4) {
+			multiplayerGamePanel.startGame();
 		}
 		this.getContentPane().removeAll();
 		this.add(panelContainer[panelIndex]);

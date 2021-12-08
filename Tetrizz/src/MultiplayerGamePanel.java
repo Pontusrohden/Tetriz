@@ -1,13 +1,12 @@
 import javax.swing.*;
 import java.awt.event.*;
-import java.util.Random;
 import java.awt.*;
 
 import javax.swing.JPanel;
 
-public class GamePanel extends JPanel implements ActionListener{
+public class MultiplayerGamePanel extends JPanel implements ActionListener{
 
-	static final int SCREEN_WIDTH = 350;
+	static final int SCREEN_WIDTH = 600;
 	static final int SCREEN_HEIGHT = 600;
 	static final int UNIT_SIZE = 25;
 	int DELAY;
@@ -15,11 +14,14 @@ public class GamePanel extends JPanel implements ActionListener{
 	boolean running = false;
 	boolean gameOver = false;
 	GameFrame frame;
-	GameBoard gameBoard;
-	Brick brick;
+	GameBoard gameBoard1;
+	GameBoard gameBoard2;
+
+	Brick brick1;
+	Brick brick2;
 	Timer timer = new Timer(DELAY, this);
 
-	GamePanel(GameFrame frame) {
+	MultiplayerGamePanel(GameFrame frame) {
 		this.frame = frame;
 		this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
 		this.setBackground(Color.black);
@@ -28,8 +30,13 @@ public class GamePanel extends JPanel implements ActionListener{
 	}
 	public void startGame() {
 		DELAY = 600;
-		gameBoard = new GameBoard(SCREEN_WIDTH,SCREEN_HEIGHT, UNIT_SIZE);
-		brick = new Brick(SCREEN_WIDTH/2, 0, UNIT_SIZE);
+		gameBoard1 = new GameBoard(300,SCREEN_HEIGHT, UNIT_SIZE);
+		brick1 = new Brick(SCREEN_WIDTH/2, 0, UNIT_SIZE);
+		gameBoard2 = new GameBoard(300,SCREEN_HEIGHT, UNIT_SIZE);
+		gameBoard2.setLocation(350,300);
+		//brick2 = new Brick(SCREEN_WIDTH+350/2, 0, UNIT_SIZE);
+		this.add(gameBoard1);
+		this.add(gameBoard2);
 		running = true;
 		gameOver = false;
 		levelUp = 100;
@@ -42,11 +49,21 @@ public class GamePanel extends JPanel implements ActionListener{
 	}
 	public void draw(Graphics g) {
 		if(!gameOver) {
-			brick.draw(g);
-			gameBoard.draw(g);
+			brick1.draw(g);
+			gameBoard1.draw(g);
 			g.setColor(Color.white);
 			g.setFont(new Font("Ink Free", Font.BOLD, 20));
-			g.drawString("Score:" + gameBoard.getScore(), (UNIT_SIZE), 20);
+			g.drawString("Score:" + gameBoard1.getScore(), (UNIT_SIZE), 20);
+			
+			g.setColor(Color.white);
+			g.setFont(new Font("Ink Free", Font.BOLD, 20));
+			g.drawString("Level: " + levelUp/100, (UNIT_SIZE), (40));
+			
+			brick2.draw(g);
+			gameBoard2.draw(g);
+			g.setColor(Color.white);
+			g.setFont(new Font("Ink Free", Font.BOLD, 20));
+			g.drawString("Score:" + gameBoard2.getScore(), (UNIT_SIZE), 20);
 			
 			g.setColor(Color.white);
 			g.setFont(new Font("Ink Free", Font.BOLD, 20));
@@ -58,19 +75,38 @@ public class GamePanel extends JPanel implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(running) {			
-			brick.drop();
-			if(gameBoard.checkBottomCollision(brick)) {
-				if(!placementIsValid()) {
+			brick1.drop();
+			if(gameBoard1.checkBottomCollision(brick1)) {
+				if(!placementIsValid(brick1)) {
 					timer.stop();
 					gameOver = true;
 					running = false;
 				}else {					
-					gameBoard.placeBlock(brick);
-					gameBoard.checkFullRow();
-					brick = new Brick(SCREEN_WIDTH/2,  0, UNIT_SIZE);
+					gameBoard1.placeBlock(brick1);
+					gameBoard1.checkFullRow();
+					brick1 = new Brick(SCREEN_WIDTH/2,  0, UNIT_SIZE);
 				}
 			}
-			if(gameBoard.getScore() >= levelUp) {
+			if(gameBoard1.getScore() >= levelUp) {
+				DELAY -= 40;
+				timer.setDelay(DELAY);
+				levelUp += 100;
+				
+			}
+			
+			brick2.drop();
+			if(gameBoard2.checkBottomCollision(brick2)) {
+				if(!placementIsValid(brick2)) {
+					timer.stop();
+					gameOver = true;
+					running = false;
+				}else {					
+					gameBoard2.placeBlock(brick2);
+					gameBoard2.checkFullRow();
+					brick2 = new Brick(SCREEN_WIDTH/2,  0, UNIT_SIZE);
+				}
+			}
+			if(gameBoard2.getScore() >= levelUp) {
 				DELAY -= 40;
 				timer.setDelay(DELAY);
 				levelUp += 100;
@@ -84,24 +120,25 @@ public class GamePanel extends JPanel implements ActionListener{
 		@Override
 		public void keyPressed(KeyEvent e) {
 			switch(e.getKeyCode()) {
+			//Player 1
 			case KeyEvent.VK_LEFT:
-				if(!gameBoard.checkLeftCollision(brick)) {					
-					brick.move(-1);
+				if(!gameBoard1.checkLeftCollision(brick1)) {					
+					brick1.move(-1);
 					repaint();
 				}
 				break;
 			case KeyEvent.VK_RIGHT:
-				if(!gameBoard.checkRightCollision(brick)) {		
-					brick.move(1);
+				if(!gameBoard1.checkRightCollision(brick1)) {		
+					brick1.move(1);
 					repaint();
 				}
 				break;
 			case KeyEvent.VK_DOWN:
-				if(!gameBoard.checkBottomCollisionFast(brick)) {		
+				if(!gameBoard1.checkBottomCollisionFast(brick1)) {		
 					pressed = true;
 					timer.stop();
 					if(pressed) {	
-						brick.drop();
+						brick1.drop();
 						repaint();
 					}
 				}
@@ -112,10 +149,47 @@ public class GamePanel extends JPanel implements ActionListener{
 				break;
 			case KeyEvent.VK_UP:
 				Brick.rotateMatrix();
-				if(gameBoard.checkLeftCollision(brick)) {
-					brick.move(1);
-				}else if(gameBoard.checkRightCollision(brick)) {
-					brick.move(-1);
+				if(gameBoard1.checkLeftCollision(brick1)) {
+					brick1.move(1);
+				}else if(gameBoard1.checkRightCollision(brick1)) {
+					brick1.move(-1);
+				}
+				repaint();
+				break;
+				
+			//Player 2
+			case KeyEvent.VK_A:
+				if(!gameBoard2.checkLeftCollision(brick2)) {					
+					brick2.move(-1);
+					repaint();
+				}
+				break;
+			case KeyEvent.VK_D:
+				if(!gameBoard2.checkRightCollision(brick2)) {		
+					brick2.move(1);
+					repaint();
+				}
+				break;
+			case KeyEvent.VK_S:
+				if(!gameBoard2.checkBottomCollisionFast(brick2)) {		
+					pressed = true;
+					timer.stop();
+					if(pressed) {	
+						brick2.drop();
+						repaint();
+					}
+				}
+				else {
+					pressed = false;
+					timer.start();
+				}
+				break;
+			case KeyEvent.VK_W:
+				Brick.rotateMatrix();
+				if(gameBoard2.checkLeftCollision(brick2)) {
+					brick2.move(1);
+				}else if(gameBoard2.checkRightCollision(brick2)) {
+					brick2.move(-1);
 				}
 				repaint();
 				break;
@@ -144,7 +218,7 @@ public class GamePanel extends JPanel implements ActionListener{
 			}
 		}
 	}
-	public boolean placementIsValid() {
+	public boolean placementIsValid(Brick brick) {
 		if(brick.getY() <= 3*UNIT_SIZE) {
 			return false;
 		}
@@ -165,7 +239,7 @@ public class GamePanel extends JPanel implements ActionListener{
 		g.setColor(Color.white);
 		g.setFont(new Font("Ink Free", Font.BOLD, 20));
 		FontMetrics metrics2 = getFontMetrics(g.getFont());
-		g.drawString("Score:" + gameBoard.getScore(), (SCREEN_WIDTH - metrics2.stringWidth("Score: " + gameBoard.getScore()))/2, (SCREEN_HEIGHT/2+40));
+		g.drawString("Score:" + gameBoard1.getScore(), (SCREEN_WIDTH - metrics2.stringWidth("Score: " + gameBoard1.getScore()))/2, (SCREEN_HEIGHT/2+40));
 	
 		g.setColor(Color.white);
 		g.setFont(new Font("Ink Free", Font.BOLD, 20));

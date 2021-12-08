@@ -5,16 +5,15 @@ import java.awt.*;
 public class StartPanel extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	static final int SCREEN_WIDTH = 600;
+	static final int SCREEN_WIDTH = 700;
 	static final int SCREEN_HEIGHT = 600;
 	
 	JButton startButton;
 	JButton settingsButton;
+	JButton multiplayerButton;
 	
 	GameFrame frame;
-	
-	int testing;
-	
+		
 	public StartPanel(GameFrame frame) {		
 		this.frame = frame;
 		this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
@@ -36,6 +35,14 @@ public class StartPanel extends JPanel {
 				frame.changePanel(2);				
 			}
 		});
+		multiplayerButton = new JButton("Multiplayer");
+		multiplayerButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				frame.changePanel(4);				
+			}
+		});
+		
 		
 		JLabel label = new JLabel("Tetriz");
 		label.setFont(new Font("Serif", Font.PLAIN, 50));
@@ -47,6 +54,7 @@ public class StartPanel extends JPanel {
 		buttonPane.setBorder(BorderFactory.createEmptyBorder(20, 10, 80, 10));
 		buttonPane.add(label);
 		buttonPane.add(startButton);
+		buttonPane.add(multiplayerButton);
 		buttonPane.add(Box.createRigidArea(new Dimension(10, 10)));
 		buttonPane.add(settingsButton);
 
